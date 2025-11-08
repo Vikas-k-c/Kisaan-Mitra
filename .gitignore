@@ -1,4 +1,6 @@
+# =========================
 # Logs
+# =========================
 logs
 *.log
 npm-debug.log*
@@ -7,18 +9,45 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# =========================
+# Node.js / Build folders
+# =========================
+node_modules/
+dist/
+dist-ssr/
+build/
 *.local
 
-# Editor directories and files
+# =========================
+# Environment variables
+# =========================
+.env
+.env.local
+.env.*.local
+
+# =========================
+# Python virtual environments (if any)
+# =========================
+venv/
+__pycache__/
+*.pyc
+
+# =========================
+# Editor / IDE / OS files
+# =========================
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# =========================
+# Optional: Package manager lock files if not needed
+# =========================
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
