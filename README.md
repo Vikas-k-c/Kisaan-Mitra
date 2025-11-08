@@ -120,28 +120,6 @@ If you have questions or need support:
 
 ---
 
-## 🏛️ Architecture
-
-+-------------------+    +------------------+    +------------------+
-|   Weather Agent   |    |   Soil Agent     |    |   Market Agent   |
-+-------------------+    +------------------+    +------------------+
-          \                  |                    /
-           \                 |                   /
-            \                |                  /
-             \               |                 /
-              +---------------------------------+
-              |    Recommendation Engine        |
-              |  (Synthesizes agent outputs)   |
-              +---------------------------------+
-                               |
-                               v
-                       +-------------------+
-                       |   User Interface  |
-                       |  (Web/React App)  |
-                       +-------------------+
-
-
----
 
 ## 📝 Contributing
 
