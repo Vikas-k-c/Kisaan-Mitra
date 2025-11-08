@@ -163,9 +163,6 @@ We welcome contributions! Please:
 
 ## 📚 Documentation
 
-- Architecture details: _coming soon_
-- API Reference: _coming soon_
-- Data Source configuration: _coming soon_
 - Troubleshooting guide: see above
 
 If you need more, please raise an issue or join our discussions.
@@ -185,12 +182,6 @@ _A:_ Yes. See the agents directory and follow code conventions.
 
 **Q:** Do I need to be technical?  
 _A:_ No. We design the UI for non-technical users.
-
----
-
-## 📄 License
-
-This project is open source, licensed under [MIT](LICENSE).
 
 ---
 
