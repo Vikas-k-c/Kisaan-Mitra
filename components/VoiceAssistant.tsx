@@ -1,6 +1,5 @@
-
 import React, { useRef, useEffect } from 'react';
-import { Language, type ConversationMessage } from '../types';
+import { type ConversationMessage } from '../types';
 import { MicrophoneIcon, StopIcon, TrashIcon, VolumeIcon } from './Icons';
 
 interface VoiceAssistantProps {
@@ -9,9 +8,10 @@ interface VoiceAssistantProps {
     onStartRecording: () => void;
     onStopRecording: () => void;
     onClearConversation: () => void;
-    selectedLanguage: Language;
-    onLanguageChange: (lang: Language) => void;
     conversation: ConversationMessage[];
+    title: string;
+    promptText: string;
+    listeningText: string;
 }
 
 export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
@@ -20,9 +20,10 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
     onStartRecording,
     onStopRecording,
     onClearConversation,
-    selectedLanguage,
-    onLanguageChange,
-    conversation
+    conversation,
+    title,
+    promptText,
+    listeningText,
 }) => {
     const conversationEndRef = useRef<HTMLDivElement>(null);
 
@@ -31,16 +32,14 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
     }, [conversation]);
 
     const handleClearClick = () => {
-        if (window.confirm("Are you sure you want to clear the conversation history?")) {
-            onClearConversation();
-        }
+        onClearConversation();
     };
 
     return (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700 mt-8">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                 <div className="flex items-center gap-3">
-                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">Voice Assistant</h3>
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">{title}</h3>
                      <button
                         onClick={handleClearClick}
                         disabled={conversation.length === 0}
@@ -52,17 +51,6 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
                     </button>
                 </div>
                 <div className="flex items-center gap-4">
-                     <div className="flex rounded-lg shadow-sm" role="group">
-                        <button type="button" onClick={() => onLanguageChange(Language.EN)} disabled={isRecording} className={`px-4 py-2 text-sm font-medium ${selectedLanguage === Language.EN ? 'bg-green-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white'} border border-gray-200 dark:border-gray-600 rounded-l-lg hover:bg-gray-100 dark:hover:bg-gray-600 focus:z-10 focus:ring-2 focus:ring-green-500 disabled:opacity-50`}>
-                            English
-                        </button>
-                        <button type="button" onClick={() => onLanguageChange(Language.HI)} disabled={isRecording} className={`px-4 py-2 text-sm font-medium ${selectedLanguage === Language.HI ? 'bg-green-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white'} border-t border-b border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 focus:z-10 focus:ring-2 focus:ring-green-500 disabled:opacity-50`}>
-                            हिंदी
-                        </button>
-                        <button type="button" onClick={() => onLanguageChange(Language.KA)} disabled={isRecording} className={`px-4 py-2 text-sm font-medium ${selectedLanguage === Language.KA ? 'bg-green-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white'} border border-gray-200 dark:border-gray-600 rounded-r-lg hover:bg-gray-100 dark:hover:bg-gray-600 focus:z-10 focus:ring-2 focus:ring-green-500 disabled:opacity-50`}>
-                            ಕನ್ನಡ
-                        </button>
-                    </div>
                     <button
                         onClick={isRecording ? onStopRecording : onStartRecording}
                         className={`relative w-16 h-16 flex items-center justify-center rounded-full transition-colors duration-300 ${isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'}`}
@@ -77,7 +65,7 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
             <div className="h-48 bg-gray-100 dark:bg-gray-900 rounded-lg p-4 overflow-y-auto space-y-4">
                 {conversation.length === 0 && (
                     <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-                       {isRecording ? "Listening..." : "Press the mic to start"}
+                       {isRecording ? listeningText : promptText}
                     </div>
                 )}
                 {conversation.map((msg, index) => (

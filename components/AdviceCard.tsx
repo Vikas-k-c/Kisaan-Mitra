@@ -4,6 +4,9 @@ import { type FinalAdvice } from '../types';
 
 interface AdviceCardProps {
   advice: FinalAdvice;
+  recommendedCropsTitle: string;
+  sowingPlanTitle: string;
+  soilManagementTipsTitle: string;
 }
 
 const getMarketPotentialColor = (potential: 'Excellent' | 'Good' | 'Fair') => {
@@ -20,12 +23,12 @@ const getMarketPotentialColor = (potential: 'Excellent' | 'Good' | 'Fair') => {
 };
 
 
-export const AdviceCard: React.FC<AdviceCardProps> = ({ advice }) => {
+export const AdviceCard: React.FC<AdviceCardProps> = ({ advice, recommendedCropsTitle, sowingPlanTitle, soilManagementTipsTitle }) => {
   return (
     <div className="space-y-6 text-gray-700 dark:text-gray-300">
       
       <div>
-        <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">🌾 Recommended Crops</h4>
+        <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">{recommendedCropsTitle}</h4>
         <div className="space-y-4">
           {advice.recommendedCrops.map((crop) => (
             <div key={crop.name} className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
@@ -42,16 +45,16 @@ export const AdviceCard: React.FC<AdviceCardProps> = ({ advice }) => {
       </div>
 
       <div>
-        <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">🗓️ Sowing Plan</h4>
+        <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">{sowingPlanTitle}</h4>
         <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
           <p className="font-bold text-md text-blue-600 dark:text-blue-400 mb-1">{advice.sowingPlan.optimalWindow}</p>
           <p className="text-sm">{advice.sowingPlan.justification}</p>
         </div>
       </div>
 
-      <div>
-        <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">🌱 Soil Management Tips</h4>
-        <ul className="list-disc list-inside space-y-2 text-sm">
+      <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg border border-yellow-300 dark:border-yellow-700">
+        <h4 className="text-lg font-semibold mb-3 text-yellow-800 dark:text-yellow-200">{soilManagementTipsTitle}</h4>
+        <ul className="list-disc list-inside space-y-2 text-base text-yellow-900 dark:text-yellow-100">
           {advice.soilManagementTips.map((tip, index) => (
             <li key={index}>{tip}</li>
           ))}
@@ -61,4 +64,3 @@ export const AdviceCard: React.FC<AdviceCardProps> = ({ advice }) => {
     </div>
   );
 };
-   

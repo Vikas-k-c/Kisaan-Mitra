@@ -1,6 +1,6 @@
 // Fix: Populating this file with all necessary service functions to resolve import errors.
-import { GoogleGenAI, Type, Blob, Modality } from "@google/genai";
-import { FinalAdvice, MarketCrop, SoilData, WeatherDay, AgentType, Language } from "../types";
+import { GoogleGenAI, Type, Blob, Modality, GenerateContentResponse } from "@google/genai";
+import { FinalAdvice, MarketCrop, SoilData, WeatherDay, AgentType, Language, GroundingSource } from "../types";
 
 const API_KEY = process.env.API_KEY;
 
@@ -18,90 +18,101 @@ const generationConfig = {
 
 const safeJSONParse = <T,>(text: string): T => {
     try {
+        // First, remove markdown fences if they exist.
         const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        return JSON.parse(cleanText) as T;
+        
+        // Find the start of the JSON (first '{' or '[')
+        const firstBracket = cleanText.indexOf('[');
+        const firstBrace = cleanText.indexOf('{');
+        
+        let start = -1;
+
+        if (firstBracket === -1 && firstBrace === -1) {
+             throw new Error("Could not find a JSON object or array in the response.");
+        }
+
+        if (firstBracket === -1) {
+            start = firstBrace;
+        } else if (firstBrace === -1) {
+            start = firstBracket;
+        } else {
+            start = Math.min(firstBracket, firstBrace);
+        }
+        
+        // Find the end of the JSON (last '}' or ']')
+        const lastBracket = cleanText.lastIndexOf(']');
+        const lastBrace = cleanText.lastIndexOf('}');
+
+        let end = Math.max(lastBracket, lastBrace);
+        
+        if (end === -1) {
+            throw new Error("Could not find a valid JSON object or array in the response.");
+        }
+        
+        const jsonString = cleanText.substring(start, end + 1);
+        return JSON.parse(jsonString) as T;
     } catch (e) {
         console.error("Failed to parse JSON:", text, e);
         throw new Error("Received invalid JSON from the model.");
     }
 };
 
+const extractSources = (response: GenerateContentResponse): GroundingSource[] => {
+    const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+    if (!chunks) return [];
+    
+    return chunks.map(chunk => ({
+        uri: chunk.web?.uri || '',
+        title: chunk.web?.title || 'Untitled Source'
+    })).filter(source => source.uri);
+};
+
+
 // --- Data Fetching Functions ---
 
-export async function getWeatherData(location: string): Promise<WeatherDay[]> {
-    const prompt = `Generate a 7-day weather forecast for ${location}.`;
+export async function getWeatherData(location: string, language: string): Promise<{ data: WeatherDay[], sources: GroundingSource[] }> {
+    const prompt = `Get the 7-day weather forecast for ${location}. The value for the "day" key MUST be the name of the day of the week, translated into the ${language} language. For example, for Hindi 'सोमवार', for Kannada 'ಸೋಮವಾರ'. Return temperatures in celsius. Respond with only a valid JSON array of objects, where each object has the following keys: "day", "high_temp_celsius", "low_temp_celsius", "precipitation_probability", and "humidity".`;
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: prompt,
         config: { 
             ...generationConfig, 
-            responseMimeType: "application/json",
-            responseSchema: {
-                type: Type.ARRAY,
-                items: {
-                    type: Type.OBJECT,
-                    properties: {
-                        day: { type: Type.STRING },
-                        high_temp_celsius: { type: Type.NUMBER },
-                        low_temp_celsius: { type: Type.NUMBER },
-                        precipitation_probability: { type: Type.NUMBER },
-                        humidity: { type: Type.NUMBER }
-                    },
-                    required: ["day", "high_temp_celsius", "low_temp_celsius", "precipitation_probability", "humidity"]
-                }
-            }
+            tools: [{googleSearch: {}}],
         }
     });
-    return safeJSONParse<WeatherDay[]>(response.text);
+    const data = safeJSONParse<WeatherDay[]>(response.text);
+    const sources = extractSources(response);
+    return { data, sources };
 }
 
-export async function getSoilData(location: string): Promise<SoilData> {
-    const prompt = `Generate a plausible soil analysis report for a farm in ${location}.`;
+export async function getSoilData(location: string, language: string): Promise<{ data: SoilData, sources: GroundingSource[] }> {
+    const prompt = `Find typical soil analysis data for farms in ${location}, including pH level, nitrogen (N), phosphorus (P), and potassium (K) levels in ppm, and average soil moisture percentage. Provide the analysis relevant for a farmer who speaks ${language}. Respond with only a valid JSON object with the following keys: "ph_level", "nitrogen_ppm", "phosphorus_ppm", "potassium_ppm", "soil_moisture_percent".`;
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: prompt,
         config: { 
             ...generationConfig, 
-            responseMimeType: "application/json",
-            responseSchema: {
-                type: Type.OBJECT,
-                properties: {
-                    ph_level: { type: Type.NUMBER },
-                    nitrogen_ppm: { type: Type.NUMBER },
-                    phosphorus_ppm: { type: Type.NUMBER },
-                    potassium_ppm: { type: Type.NUMBER },
-                    soil_moisture_percent: { type: Type.NUMBER }
-                },
-                required: ["ph_level", "nitrogen_ppm", "phosphorus_ppm", "potassium_ppm", "soil_moisture_percent"]
-            }
+            tools: [{googleSearch: {}}],
         }
     });
-    return safeJSONParse<SoilData>(response.text);
+    const data = safeJSONParse<SoilData>(response.text);
+    const sources = extractSources(response);
+    return { data, sources };
 }
 
-export async function getMarketData(location: string): Promise<MarketCrop[]> {
-    const prompt = `Generate a market analysis for 5 agricultural crops suitable for the climate of ${location}.`;
+export async function getMarketData(location: string, language: string): Promise<{ data: MarketCrop[], sources: GroundingSource[] }> {
+    const prompt = `Find current market prices for 5 agricultural crops commonly grown in ${location}. The "crop_name" field in your response MUST be in ${language}. For example, for Hindi 'गेहूं', for Kannada 'ಗೋಧಿ'. Respond with only a valid JSON array of objects, where each object has the following keys: "crop_name" and "market_price_per_kg".`;
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: prompt,
         config: { 
-            ...generationConfig, 
-            responseMimeType: "application/json",
-            responseSchema: {
-                type: Type.ARRAY,
-                items: {
-                    type: Type.OBJECT,
-                    properties: {
-                        crop_name: { type: Type.STRING },
-                        market_price_per_kg: { type: Type.STRING },
-                        demand_trend: { type: Type.STRING, description: "Can be 'High', 'Medium', or 'Low'" }
-                    },
-                    required: ["crop_name", "market_price_per_kg", "demand_trend"]
-                }
-            }
+            ...generationConfig,
+            tools: [{googleSearch: {}}], 
         }
     });
-    return safeJSONParse<MarketCrop[]>(response.text);
+    const data = safeJSONParse<MarketCrop[]>(response.text);
+    const sources = extractSources(response);
+    return { data, sources };
 }
 
 export async function getFinalAdvice(
@@ -144,8 +155,8 @@ export async function getFinalAdvice(
                         items: {
                             type: Type.OBJECT,
                             properties: {
-                                name: { type: Type.STRING, description: "Name of the crop." },
-                                reasoning: { type: Type.STRING, description: "Detailed explanation for why this crop is recommended, considering weather, soil, and market data." },
+                                name: { type: Type.STRING, description: `Name of the crop. The text MUST be in ${language}.` },
+                                reasoning: { type: Type.STRING, description: `Detailed explanation for why this crop is recommended, considering weather, soil, and market data. The text MUST be in ${language}.` },
                                 marketPotential: { type: Type.STRING, description: "Market potential, can be 'Excellent', 'Good', or 'Fair'." }
                             },
                              required: ["name", "reasoning", "marketPotential"]
@@ -155,19 +166,19 @@ export async function getFinalAdvice(
                         type: Type.OBJECT,
                         description: "A plan for when to sow the crops.",
                         properties: {
-                            optimalWindow: { type: Type.STRING, description: "The best time frame to sow, e.g., 'Next 3-5 days'." },
-                            justification: { type: Type.STRING, description: "Why this is the best time, referencing the weather forecast." }
+                            optimalWindow: { type: Type.STRING, description: `The best time frame to sow, e.g., 'Next 3-5 days'. The text MUST be in ${language}.` },
+                            justification: { type: Type.STRING, description: `Why this is the best time, referencing the weather forecast. The text MUST be in ${language}.` }
                         },
                          required: ["optimalWindow", "justification"]
                     },
                     soilManagementTips: {
                         type: Type.ARRAY,
                         description: "A list of 1-3 actionable tips for soil improvement based on the analysis.",
-                        items: { type: Type.STRING }
+                        items: { type: Type.STRING, description: `An actionable tip for the user. The text MUST be in ${language}.` }
                     },
                     summary: {
                         type: Type.STRING,
-                        description: "A detailed, conversational summary of all key recommendations. It should include the top recommended crop and its reasoning, the optimal sowing window, and at least one key soil management tip. This summary will be read aloud by a voice assistant."
+                        description: `A detailed, conversational summary of all key recommendations. It should include the top recommended crop and its reasoning, the optimal sowing window, and at least one key soil management tip. This summary will be read aloud by a voice assistant. The text MUST be in ${language}.`
                     }
                 },
                 required: ["recommendedCrops", "sowingPlan", "soilManagementTips", "summary"]
@@ -261,19 +272,19 @@ export function createSummaryForTTS(agentType: AgentType, data: any, language: L
 
     switch (agentType) {
         case AgentType.WEATHER:
-            const weatherData = (data as WeatherDay[]).slice(0, 3);
+            const weatherData = data as WeatherDay[];
             if (language === Language.EN) {
-                summary = `Here is the weather forecast for the next three days. `;
+                summary = `Here is the weather forecast for the next seven days. `;
                 weatherData.forEach(day => {
                     summary += `On ${day.day}, the high will be ${day.high_temp_celsius} degrees with a low of ${day.low_temp_celsius}, and a ${day.precipitation_probability} percent chance of rain. `;
                 });
             } else if (language === Language.HI) {
-                summary = `अगले तीन दिनों का मौसम पूर्वानुमान यहाँ है। `;
+                summary = `अगले सात दिनों का मौसम पूर्वानुमान यहाँ है। `;
                 weatherData.forEach(day => {
                     summary += `${day.day} को, अधिकतम तापमान ${day.high_temp_celsius} डिग्री और न्यूनतम ${day.low_temp_celsius} डिग्री रहेगा, और बारिश की ${day.precipitation_probability} प्रतिशत संभावना है। `;
                 });
             } else { // Kannada
-                summary = `ಮುಂದಿನ ಮೂರು ದಿನಗಳ ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ ಇಲ್ಲಿದೆ। `;
+                summary = `ಮುಂದಿನ ಏಳು ದಿನಗಳ ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ ಇಲ್ಲಿದೆ। `;
                 weatherData.forEach(day => {
                     summary += `${day.day} ರಂದು, ಗರಿಷ್ಠ ತಾಪಮಾನ ${day.high_temp_celsius} ಡಿಗ್ರಿ ಮತ್ತು ಕನಿಷ್ಠ ${day.low_temp_celsius} ಡಿಗ್ರಿ ಇರುತ್ತದೆ, ಮತ್ತು ಮಳೆಯ ಸಂಭವನೀಯತೆ ${day.precipitation_probability} ಪ್ರತಿಶತ. `;
                 });
@@ -294,17 +305,17 @@ export function createSummaryForTTS(agentType: AgentType, data: any, language: L
             if (language === Language.EN) {
                 summary = `Here is the market analysis for the top crops. `;
                 marketData.forEach(crop => {
-                    summary += `${crop.crop_name} is trading at ${crop.market_price_per_kg} with ${crop.demand_trend} demand. `;
+                    summary += `${crop.crop_name} is trading at ${crop.market_price_per_kg}. `;
                 });
             } else if (language === Language.HI) {
                 summary = `शीर्ष फसलों के लिए बाजार विश्लेषण यहाँ है। `;
                 marketData.forEach(crop => {
-                    summary += `${crop.crop_name} का कारोबार ${crop.market_price_per_kg} पर हो रहा है और इसकी मांग ${crop.demand_trend} है। `;
+                    summary += `${crop.crop_name} का कारोबार ${crop.market_price_per_kg} पर हो रहा है। `;
                 });
             } else { // Kannada
                 summary = `ಪ್ರಮುಖ ಬೆಳೆಗಳ ಮಾರುಕಟ್ಟೆ ವಿಶ್ಲೇಷಣೆ ಇಲ್ಲಿದೆ। `;
                 marketData.forEach(crop => {
-                    summary += `${crop.crop_name} ವು ${crop.market_price_per_kg} ದರದಲ್ಲಿ ವಹಿವಾಟು ನಡೆಸುತ್ತಿದೆ ಮತ್ತು ${crop.demand_trend} ಬೇಡಿಕೆಯಲ್ಲಿದೆ. `;
+                    summary += `${crop.crop_name} ವು ${crop.market_price_per_kg} ದರದಲ್ಲಿ ವಹಿವಾಟು ನಡೆಸುತ್ತಿದೆ। `;
                 });
             }
             break;

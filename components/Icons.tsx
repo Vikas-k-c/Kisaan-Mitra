@@ -1,7 +1,9 @@
+
 import React from 'react';
 
 const iconClass = "w-8 h-8";
 const smallIconClass = "w-6 h-6";
+const subAgentIconClass = "w-5 h-5";
 
 export const CloudIcon: React.FC = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -64,4 +66,41 @@ export const SpinnerIcon: React.FC<{ className?: string }> = ({ className }) => 
         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
     </svg>
+);
+
+// New Sub-Agent Icons
+export const ThermometerIcon: React.FC = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={subAgentIconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 14h6M9 10h6M9 6h6M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+);
+
+export const AlertTriangleIcon: React.FC = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={subAgentIconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+  </svg>
+);
+
+export const TestTubeIcon: React.FC = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={subAgentIconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547a2 2 0 00-.547 1.806l.477 2.387a6 6 0 00.517 3.86l.158.318a6 6 0 00.517 3.86l2.387.477a2 2 0 001.806-.547a2 2 0 00.547-1.806l-.477-2.387a6 6 0 00-.517-3.86l-.158-.318a6 6 0 00-.517-3.86l-2.387-.477a2 2 0 00-.547-1.022m13.42 0a2 2 0 00-1.022.547l-2.387.477a6 6 0 00-3.86-.517l-.318-.158a6 6 0 01-3.86-.517L6.05 15.21a2 2 0 00-1.806-.547a2 2 0 00-.547-1.806L4.502 10.5a6 6 0 00.517-3.86l.158-.318a6 6 0 01.517-3.86l2.387-.477a2 2 0 011.806.547a2 2 0 01.547 1.806l-.477 2.387a6 6 0 01-.517 3.86l-.158.318a6 6 0 00-.517 3.86l2.387.477a2 2 0 00.547 1.022" />
+  </svg>
+);
+
+export const DropletIcon: React.FC = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={subAgentIconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a5 5 0 01-.707-7.071L12 3.858l5.707 5.071a5.001 5.001 0 01-4.95 8.071 4.967 4.967 0 01-1.451-.273A5.003 5.003 0 017 16z" />
+  </svg>
+);
+
+export const TagIcon: React.FC = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={subAgentIconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A2 2 0 013 8V5a2 2 0 012-2z" />
+  </svg>
+);
+
+export const GlobeIcon: React.FC = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={subAgentIconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h8a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.707 4.293a1 1 0 010 1.414L5.414 8l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zM16.293 4.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L18.586 8l-2.293-2.293a1 1 0 010-1.414z" />
+  </svg>
 );

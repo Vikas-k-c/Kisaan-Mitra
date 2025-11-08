@@ -53,7 +53,6 @@ export interface SoilData {
 export interface MarketCrop {
   crop_name: string;
   market_price_per_kg: string;
-  demand_trend: 'High' | 'Medium' | 'Low';
 }
 
 export interface RecommendedCrop {
@@ -74,9 +73,31 @@ export interface FinalAdvice {
   summary: string;
 }
 
+// New types for sub-agents
+export interface ExtremeWeatherAlert {
+  type: 'Heatwave' | 'Frost' | 'Heavy Rain' | 'High Winds' | 'None';
+  message: string;
+}
+
+export interface SubAgentStatuses {
+  [key: string]: AgentStatus;
+}
+
+export interface MainAgentStatus {
+  main: AgentStatus;
+  subAgents: SubAgentStatuses;
+}
+
+// Updated AgentStatuses to be hierarchical
 export interface AgentStatuses {
-  weather: AgentStatus;
-  soil: AgentStatus;
-  market: AgentStatus;
+  weather: MainAgentStatus;
+  soil: MainAgentStatus;
+  market: MainAgentStatus;
   planner: AgentStatus;
+}
+
+// New type for grounding sources
+export interface GroundingSource {
+  uri: string;
+  title: string;
 }
