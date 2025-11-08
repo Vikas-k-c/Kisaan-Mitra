@@ -23,6 +23,7 @@ Kisaan-Mitra is an AI-driven farming assistant aimed at revolutionizing agricult
 
 - Node.js (v16+ recommended)
 - npm
+- A Google Gemini API key (see instructions below)
 
 ### Steps
 
@@ -37,13 +38,22 @@ Kisaan-Mitra is an AI-driven farming assistant aimed at revolutionizing agricult
     npm install
     ```
 
-3. **Run the application:**
+3. **Create your API key:**  
+   The AI features require a Google Gemini API key. You **must create your own key** and set it in a `.env` file at the root of the project:
+
+    ```
+    REACT_APP_API_KEY=<your_google_gemini_api_key>
+    ```
+
+   > **Note:** Without this key, the UI will work but AI recommendations will not be generated.
+
+4. **Run the application:**
     ```bash
     npm start
     ```
 
-4. **Access the Web Interface:**
-    - Open your browser and navigate to `http://localhost:XXXX` (port will be shown in your terminal after starting).
+5. **Access the Web Interface:**
+    - Open your browser and navigate to `http://localhost:3000` (port will be shown in your terminal after starting).
 
 ---
 
@@ -51,44 +61,30 @@ Kisaan-Mitra is an AI-driven farming assistant aimed at revolutionizing agricult
 
 After you’ve set up the system:
 
-1. **Open the Web Interface:**  
-   Visit the local address shown in your terminal (e.g., http://localhost:3000).
-
-2. **Register or Log In:**  
-   Start by registering as a user (if authentication is enabled), or just begin as a guest if supported.
-
+1. **Open the Web Interface** at the local address shown in your terminal.
+2. **Register or Log In:** Start by registering as a user (if authentication is enabled), or use as a guest.
 3. **Enter Your Details:**
     - **Farm Location:** Choose or enter your district, village, or pin code.
-    - **Soil Data:** If you have it, provide soil type, moisture level, or use “Auto-detect” if you have sensors connected.
+    - **Soil Data:** Provide soil type, moisture level, or use “Auto-detect” if sensors are connected.
     - **Crop Interests:** Select crops you want advice about (e.g., wheat, rice, maize).
-
 4. **Receive Recommendations:**  
-   Kisaan-Mitra will analyze weather, soil, and market data using its multi-agent engine. You will get:
+   Kisaan-Mitra will analyze data using its multi-agent engine. You will get:
     - Best crops for your current conditions.
     - Suggested sowing and planting dates.
     - Market pricing trends and advice on when to harvest or sell.
-
 5. **Check Updates:**  
-   The advice updates automatically as new data comes in. Refresh or revisit to get fresh insights as conditions change.
-
+   Advice updates automatically as new data comes in. Refresh or revisit to get fresh insights.
 6. **Explore Advanced Features:**
-    - View data visualizations (weather charts, soil health maps, market graphs).
+    - Data visualizations (weather charts, soil health maps, market graphs).
     - Export findings or recommendations.
     - Connect your sensors or extension modules for more accurate data.
-
-### Example User Flow
-
-- Ramesh, a farmer in Uttar Pradesh, enters soil type (“Loamy”), location (“Mathura”), and crop (“Mustard”).
-- Kisaan-Mitra suggests sowing Mustard between October 15–20, based on local weather and market forecasts, and recommends soil improvement tips.
-- Ramesh follows the advice—and gets notified if rainfall or price conditions change unexpectedly.
-
-> No special technical knowledge is required. Kisaan-Mitra is designed to be farmer-friendly, with options for mobile and desktop access.
 
 ---
 
 ## 📝 Troubleshooting
 
 - If the site doesn’t load, verify Node.js is installed and that you ran `npm install` and `npm start`.
+- Ensure the `.env` file contains a valid API key; otherwise, AI recommendations will not work.
 - For sensor integration, check the documentation for compatible devices.
 
 ---
@@ -104,49 +100,46 @@ If you have questions or need support:
 
 ## 🧠 Features
 
-- **Multi-Agent AI System**
-    - Different agents focus on weather, soil, and market data.
-    - Agents collaborate to produce optimal recommendations.
-- **Personalized & Real-Time**
-    - Advice is customized for each user and updated continuously.
-- **Integrated Data Sources**
-    - Fetches reliable data from open APIs and local sensors.
-- **User-Friendly Interface**
-    - Designed for easy, intuitive usage by farmers and agriculture professionals.
-- **Modular Architecture**
-    - Easily extendable to include more data sources or agents.
+- **Multi-Agent AI System**  
+  Agents focus on weather, soil, and market data and collaborate to produce recommendations.
+- **Personalized & Real-Time**  
+  Advice is customized per user and updated continuously.
+- **Integrated Data Sources**  
+  Fetches reliable data from open APIs and local sensors.
+- **User-Friendly Interface**  
+  Designed for intuitive use by farmers and agriculture professionals.
+- **Modular Architecture**  
+  Easily extendable to include more data sources or agents.
 
 ---
 
 ## 🏆 Tech Stack
 
-- **TypeScript** (99.2%) – The primary language for application logic and agents.
-- **HTML** (0.8%) – For user interface scaffolding and presentation.
+- **TypeScript** – Primary language for application logic and agents.  
+- **HTML** – User interface scaffolding.
 
 ---
 
 ## 🏛️ Architecture
 
-```
-+-------------------+        +------------------+        +------------------+
-|   Weather Agent   |        |   Soil Agent     |        |   Market Agent   |
-+-------------------+        +------------------+        +------------------+
-          \                        |                           /
-           \                       |                          /
-            \                      |                         /
-             +-----------------------------------------------+
-             |         Recommendation Engine                 |
-             +-----------------------------------------------+
++-------------------+    +------------------+    +------------------+
+|   Weather Agent   |    |   Soil Agent     |    |   Market Agent   |
++-------------------+    +------------------+    +------------------+
+          \                  |                    /
+           \                 |                   /
+            \                |                  /
+             \               |                 /
+              +---------------------------------+
+              |    Recommendation Engine        |
+              |  (Synthesizes agent outputs)   |
+              +---------------------------------+
                                |
                                v
                        +-------------------+
-                       |  User Interface   |
+                       |   User Interface  |
+                       |  (Web/React App)  |
                        +-------------------+
-```
 
-- **Agents**: Specialized modules for each domain.
-- **Recommendation Engine**: Combines agent outputs for tailored advice.
-- **User Interface**: Makes insights easy to understand and act upon.
 
 ---
 
@@ -154,18 +147,10 @@ If you have questions or need support:
 
 We welcome contributions! Please:
 
-1. **Fork** the repo and create your branch.
-2. **Add your changes**—preferably in TypeScript for core logic.
-3. **Test your changes** locally.
-4. **Open a pull request** describing what you've added or fixed.
-
----
-
-## 📚 Documentation
-
-- Troubleshooting guide: see above
-
-If you need more, please raise an issue or join our discussions.
+1. **Fork** the repo and create a branch.  
+2. **Add your changes**—preferably in TypeScript for core logic.  
+3. **Test changes locally**.  
+4. **Open a pull request** describing your updates.
 
 ---
 
@@ -174,22 +159,22 @@ If you need more, please raise an issue or join our discussions.
 **Q:** Who is this for?  
 _A:_ Rural farmers, extension officers, agtech developers.
 
-**Q:** How can I localize this for my region?  
-_A:_ The system is modular; translation and local data source support are planned. See documentation and contribute.
+**Q:** How can I localize for my region?  
+_A:_ The system is modular; translation and local data source support are planned.
 
 **Q:** Can I add my own sensor or agent?  
-_A:_ Yes. See the agents directory and follow code conventions.
+_A:_ Yes. Follow the code conventions in the `agents` directory.
 
 **Q:** Do I need to be technical?  
-_A:_ No. We design the UI for non-technical users.
+_A:_ No. UI is designed for non-technical users.
 
 ---
 
 ## 🏆 Acknowledgements
 
-- Inspired by the vision to empower rural communities through technology.
+- Inspired by the vision to empower rural communities through technology.  
 - Created by Vikas-k-c and contributors.
 
 ---
 
-> _Kisaan-Mitra strives to enable rural prosperity through intelligent methods. Your feedback helps us grow!_
+> _Kisaan-Mitra strives to enable rural prosperity through intelligent methods. Users need to generate their own API key to fully experience AI recommendations._
