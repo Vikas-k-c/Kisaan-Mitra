@@ -151,7 +151,7 @@ _A:_ No. UI is designed for non-technical users.
 ## 🏆 Acknowledgements
 
 - Inspired by the vision to empower rural communities through technology.  
-- Created by Vikas-k-c and contributors.
+- Created by Vikas, Yash, Shrihari and Swaroop.
 
 ---
 
