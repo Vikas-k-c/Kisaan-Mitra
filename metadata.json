@@ -1,0 +1,7 @@
+{
+  "name": "Kisaan Mitra",
+  "description": "A multi-agent AI system where agents collaborate to gather and analyse weather, soil, and market information to provide personalized, real-time farming advice for rural communities.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
